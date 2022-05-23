@@ -25,12 +25,12 @@ if __name__ ==  "__main__":
     cleaning_above_hour = int(sys.argv[2])
     cleaning_above_minute = int(sys.argv[3])
     in_dir = ""
-    print "Cleaning logs below 20 minutes (no streams should be seen) and above {0} hour {1} minute".format(cleaning_above_hour, cleaning_above_minute)
+    print("Cleaning logs below 20 minutes (no streams should be seen) and above {0} hour {1} minute".format(cleaning_above_hour, cleaning_above_minute))
     for dirpath, dirnames, fnames in os.walk(os.path.join(pathname, 'shadow.data/hosts/')):
         for dirname in dirnames:
             if 'relayguard' in dirname or 'relayexit' in dirname:
                 in_dir = os.path.join(dirpath, dirname)
-                print 'Cleaning log from {0}'.format(dirname)
+                print('Cleaning log from {0}'.format(dirname))
                 clean_log(in_dir, cleaning_above_hour, cleaning_above_minute)
-    print "All done. yay!"
+    print("All done. yay!")
 
